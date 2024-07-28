@@ -1,147 +1,130 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.6">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurtosis Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f0f8ff; }
+        input, button { margin: 10px 0; }
+        #error { color: red; }
+    </style>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;title&gt;Kurtosis Calculator&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdn.jsdelivr.net/npm/chart.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f0f8ff; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>input, button { margin: 10px 0; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>#error { color: red; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Kurtosis Calculator&lt;/h1&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;input type="file" id="fileInput" accept=".csv,.txt"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;textarea id="dataInput" rows="5" cols="50" placeholder="Or enter comma-separated values here"&gt;&lt;/textarea&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button onclick="analyzeData()"&gt;Analyze Data&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="error"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="result"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;canvas id="dataChart"&gt;&lt;/canvas&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="downloadTxt" style="display:none;" onclick="downloadTxt()"&gt;Download Kurtosis_Coefficient.txt&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button id="downloadPdf" style="display:none;" onclick="downloadPdf()"&gt;Download Graphs.pdf&lt;/button&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;script&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let chart;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>let kurtosisValue;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function analyzeData() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const fileInput = document.getElementById('fileInput');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const dataInput = document.getElementById('dataInput');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const errorDiv = document.getElementById('error');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const resultDiv = document.getElementById('result');</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>errorDiv.textContent = '';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>resultDiv.textContent = '';</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>let data;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (fileInput.files.length &gt; 0) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>const reader = new FileReader();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>reader.onload = function(e) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>data = e.target.result.split(',').map(Number);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>processData(data);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>};</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>reader.readAsText(fileInput.files[0]);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else if (dataInput.value.trim() !== '') {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>data = dataInput.value.split(',').map(Number);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>processData(data);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>} else {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>errorDiv.textContent = 'Please input data either by file or text.';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function processData(data) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (data.some(isNaN)) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>document.getElementById('error').textContent = 'Invalid data. Please ensure all values are numbers.';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>kurtosisValue = calculateKurtosis(data);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('result').textContent = `Kurtosis Coefficient: ${kurtosisValue.toFixed(4)}`;</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>createChart(data);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('downloadTxt').style.display = 'inline';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>document.getElementById('downloadPdf').style.display = 'inline';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function calculateKurtosis(data) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const n = data.length;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const mean = data.reduce((sum, val) =&gt; sum + val, 0) / n;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const variance = data.reduce((sum, val) =&gt; sum + Math.pow(val - mean, 2), 0) / n;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const stdDev = Math.sqrt(variance);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const fourthMoment = data.reduce((sum, val) =&gt; sum + Math.pow((val - mean) / stdDev, 4), 0) / n;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>return fourthMoment - 3;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function createChart(data) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const ctx = document.getElementById('dataChart').getContext('2d');</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>if (chart) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>chart.destroy();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>chart = new Chart(ctx, {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>type: 'line',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>data: {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>labels: data.map((_, index) =&gt; index + 1),</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>datasets: [{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>label: 'Data Points',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>data: data,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>borderColor: 'blue',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>fill: false</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}]</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>options: {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>responsive: true,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>title: {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>display: true,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                        </span>text: 'Data Visualization'</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function downloadTxt() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const blob = new Blob([`Kurtosis Coefficient: ${kurtosisValue.toFixed(4)}`], { type: 'text/plain' });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const link = document.createElement('a');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>link.href = URL.createObjectURL(blob);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>link.download = 'Kurtosis_Coefficient.txt';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>link.click();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>function downloadPdf() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const { jsPDF } = window.jspdf;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const doc = new jsPDF();</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>doc.text(`Kurtosis Coefficient: ${kurtosisValue.toFixed(4)}`, 10, 10);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const canvas = document.getElementById('dataChart');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>const imgData = canvas.toDataURL('image/png');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>doc.addImage(imgData, 'PNG', 10, 20, 190, 100);</span></p>
-<p class="p2"><span class="s1"><span class="Apple-converted-space">            </span></span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>doc.save('Graphs.pdf');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+    <h1>Kurtosis Calculator</h1>
+    <input type="file" id="fileInput" accept=".csv,.txt">
+    <textarea id="dataInput" rows="5" cols="50" placeholder="Or enter comma-separated values here"></textarea>
+    <button onclick="analyzeData()">Analyze Data</button>
+    <div id="error"></div>
+    <div id="result"></div>
+    <canvas id="dataChart"></canvas>
+    <button id="downloadTxt" style="display:none;" onclick="downloadTxt()">Download Kurtosis_Coefficient.txt</button>
+    <button id="downloadPdf" style="display:none;" onclick="downloadPdf()">Download Graphs.pdf</button>
+
+    <script>
+        let chart;
+        let kurtosisValue;
+
+        function analyzeData() {
+            const fileInput = document.getElementById('fileInput');
+            const dataInput = document.getElementById('dataInput');
+            const errorDiv = document.getElementById('error');
+            const resultDiv = document.getElementById('result');
+
+            errorDiv.textContent = '';
+            resultDiv.textContent = '';
+
+            let data;
+            if (fileInput.files.length > 0) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    data = e.target.result.split(',').map(Number);
+                    processData(data);
+                };
+                reader.readAsText(fileInput.files[0]);
+            } else if (dataInput.value.trim() !== '') {
+                data = dataInput.value.split(',').map(Number);
+                processData(data);
+            } else {
+                errorDiv.textContent = 'Please input data either by file or text.';
+            }
+        }
+
+        function processData(data) {
+            if (data.some(isNaN)) {
+                document.getElementById('error').textContent = 'Invalid data. Please ensure all values are numbers.';
+                return;
+            }
+
+            kurtosisValue = calculateKurtosis(data);
+            document.getElementById('result').textContent = `Kurtosis Coefficient: ${kurtosisValue.toFixed(4)}`;
+            
+            createChart(data);
+            
+            document.getElementById('downloadTxt').style.display = 'inline';
+            document.getElementById('downloadPdf').style.display = 'inline';
+        }
+
+        function calculateKurtosis(data) {
+            const n = data.length;
+            const mean = data.reduce((sum, val) => sum + val, 0) / n;
+            const variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
+            const stdDev = Math.sqrt(variance);
+            
+            const fourthMoment = data.reduce((sum, val) => sum + Math.pow((val - mean) / stdDev, 4), 0) / n;
+            return fourthMoment - 3;
+        }
+
+        function createChart(data) {
+            const ctx = document.getElementById('dataChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map((_, index) => index + 1),
+                    datasets: [{
+                        label: 'Data Points',
+                        data: data,
+                        borderColor: 'blue',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Data Visualization'
+                    }
+                }
+            });
+        }
+
+        function downloadTxt() {
+            const blob = new Blob([`Kurtosis Coefficient: ${kurtosisValue.toFixed(4)}`], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Kurtosis_Coefficient.txt';
+            link.click();
+        }
+
+        function downloadPdf() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.text(`Kurtosis Coefficient: ${kurtosisValue.toFixed(4)}`, 10, 10);
+            
+            const canvas = document.getElementById('dataChart');
+            const imgData = canvas.toDataURL('image/png');
+            doc.addImage(imgData, 'PNG', 10, 20, 190, 100);
+            
+            doc.save('Graphs.pdf');
+        }
+    </script>
 </body>
 </html>
